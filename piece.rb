@@ -1,5 +1,5 @@
 class Piece
-    attr_reader :color, :posn
+    attr_reader :color, :posn, :board
 
     UP_SLIDES = [[-1,-1], [1,-1]]
     DOWN_SLIDES = [[-1,1], [1,1]]
@@ -47,17 +47,17 @@ class Piece
     end
 
     def slides
-        raw_slides.filter { |square| board.empty?(square) }
+        raw_slides.keep_if { |square| board.empty?(square) }
     end
  
     def jumps
-        raw_slides.each_with_object([]) do |middle_square, jumps| 
-            if board.empty?(middle_square)
+        raw_jumps.each_with_object([]) do |target_square, jumps| 
+            if board.empty?(Board.midpoint(posn,target_square))
                 next
-            elsif !board.empty?(double_move(middle_square))
+            elsif !(board.empty?(target_square))
                 next
             else
-                jumps << double_move(middle_square)
+                jumps << target_square
             end
         end
     end
@@ -80,6 +80,20 @@ class Piece
 
         cands.map { |diff| [posn[0] + diff[0], posn[1] + diff[1]] }
     end
+
+     def raw_jumps
+        cands = UP_JUMPS + DOWN_JUMPS if king?
+        case color
+        when :black
+            cands = BLACK_JUMPS
+        when :red
+            cands = RED_JUMPS
+        else
+            raise "Piece has invalid color"
+        end
+
+        cands.map { |diff| [posn[0] + diff[0], posn[1] + diff[1]] }
+    end   
 
     def double_move(diff_posn)
         x,y = diff_posn

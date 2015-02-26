@@ -7,29 +7,39 @@ class Board
     
     def initialize(options = {})
         @grid ||= options[:grid]
-        #debugger
         initial_grid if @grid.nil?
     end
 
     def empty?(posn)
-        self[posn].nil?
+        self[*posn].nil?
     end
 
     def occupied?(posn)
         !empty?(posn)
     end
 
-    def [](posn)
-        grid[posn[1]][posn[0]]
+    def [](x,y)
+        grid[y][x]
     end
 
-    def []=(posn, value)
-        grid[posn[1]][posn[0]] = value
+    def []=(x,y, value)
+        grid[y][x] = value
     end
 
-    def set_posn!(piece, posn)
-        self[posn] = piece
+    def set_posn(piece,posn)
+        raise "Piece missing" unless self[*piece.posn] == piece
+        set_posn!(piece,posn,piece.posn)
+    end
+
+    
+    def set_posn!(piece, posn, old_posn)
+        self[*posn] = piece
         piece.set_posn!(posn)
+        self[*old_posn] = nil
+    end
+
+    def display
+        puts render
     end
 
     def render
@@ -65,17 +75,18 @@ class Board
         captures = []
         raise "Invalid Move, no piece there" if 
                 empty?(start_posn)
-        piece = self[start_posn]
+        piece = self[*start_posn]
         if piece.jumps.include?(end_posn)
             captures << jumped_over(start_posn,end_posn)
-            set_posn!(piece,end_posn)
+            set_posn(piece,end_posn)
         elsif piece.slides.include?(end_posn)
-            set_posn!(piece,end_posn)
+            set_posn(piece,end_posn)
         else
             raise "Invalid Move, piece cannot move there" 
         end
         captures.each do |captured_posn|
-            self[captured_posn] = nil
+            debugger
+            self[*captured_posn] = nil
         end
 
         piece
@@ -89,13 +100,13 @@ class Board
             end
         end.all? {|val| [-2,2].include?(val) }
         if valid_jump
-            midpoint(start_posn,end_posn)
+            Board.midpoint(start_posn,end_posn)
         else
             nil
         end
     end
 
-    def midpoint(start_posn,end_posn)
+    def self.midpoint(start_posn,end_posn)
         [(start_posn[0]+end_posn[0])/2, 
          (start_posn[1]+end_posn[1])/2] 
     end
@@ -106,7 +117,6 @@ class Board
     def initial_grid
         self.grid = Array.new(8) { Array.new(8) }
         self.grid.each_with_index do |row, index|
-            #debugger
             row.each_index do |col|
                 if 1 == (index + col)%2
                     next
@@ -127,3 +137,18 @@ class Board
         row[posn[0]] = p
     end
 end
+
+def setup_jump
+    b = Board.new
+    b.display
+    puts "\n"
+    b.move([0,2],[1,3])
+    b.move([3,5],[2,4])
+    b.display
+    puts "\n"
+    puts "a jump; b.move([1,3],[3,5])"
+
+    b
+end
+
+
