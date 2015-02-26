@@ -6,7 +6,7 @@ class Piece
     BLACK_SLIDES = UP_SLIDES
     RED_SLIDES = DOWN_SLIDES
 
-    UP_JUMPS = UP_SLIDES.ma {|x,y| [2*x,2*y]}
+    UP_JUMPS = UP_SLIDES.map {|x,y| [2*x,2*y]}
     DOWN_JUMPS = DOWN_SLIDES.map {|x,y| [2*x,2*y]}
     BLACK_JUMPS = UP_JUMPS
     RED_JUMPS = DOWN_JUMPS
@@ -17,9 +17,33 @@ class Piece
         @color = options[:color]
         @board = options[:board]
     end
-    
+
     def king?
         @king
+    end
+    
+    def symbol
+        sym = ""
+        if color == :red
+            sym += "@"
+        elsif color == :black
+            sym += "*"
+        else
+            raise "Invalid piece color"
+        end
+        if king?
+            sym += "K"
+        else
+            sym += " "
+        end
+        
+        sym
+    end
+            
+
+    def inspect
+        "<Piece @king=#{king?} @posn=#{posn.inspect} @color=#{color} "\
+        "@board = #{@board.nil? ? nil : '<Board ...>'}"
     end
 
     def slides
@@ -36,6 +60,10 @@ class Piece
                 jumps << double_move(middle_square)
             end
         end
+    end
+
+    def set_posn!(value)
+        @posn = value
     end
 
     private
@@ -59,7 +87,4 @@ class Piece
         [2*x,2*y]
     end
 
-    def set_posn!(value)
-        @posn = value
-    end
 end
