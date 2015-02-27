@@ -1,5 +1,6 @@
 class Piece
     attr_reader :color, :posn, :board
+    attr_writer :king
 
     UP_SLIDES = [[-1,-1], [1,-1]]
     DOWN_SLIDES = [[-1,1], [1,1]]
@@ -47,12 +48,15 @@ class Piece
     end
 
     def slides
-        raw_slides.keep_if { |square| board.empty?(square) }
+        raw_slides.keep_if { |square| board.on_board?(square) &&
+                                      board.empty?(square) }
     end
  
     def jumps
         raw_jumps.each_with_object([]) do |target_square, jumps| 
-            if board.empty?(Board.midpoint(posn,target_square))
+            if !board.on_board?(target_square)
+                next
+            elsif board.empty?(Board.midpoint(posn,target_square))
                 next
             elsif !(board.empty?(target_square))
                 next
@@ -82,7 +86,6 @@ class Piece
     end
 
      def raw_jumps
-        cands = UP_JUMPS + DOWN_JUMPS if king?
         case color
         when :black
             cands = BLACK_JUMPS
@@ -91,6 +94,7 @@ class Piece
         else
             raise "Piece has invalid color"
         end
+        cands = UP_JUMPS + DOWN_JUMPS if king?
 
         cands.map { |diff| [posn[0] + diff[0], posn[1] + diff[1]] }
     end   

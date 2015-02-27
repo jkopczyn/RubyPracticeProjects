@@ -3,6 +3,12 @@ require 'byebug'
 require 'colorize'
 
 class Board
+    BOARD_SIZE = 8
+    RED_SIDE = (0..2).to_a
+    RED_HOME_ROW = RED_SIDE.first
+    BLACK_SIDE =  (BOARD_SIZE-3 .. BOARD_SIZE-1).to_a.reverse
+    BLACK_HOME_ROW = BLACK_SIDE.first
+    
     attr_accessor :grid
     
     def initialize(options = {})
@@ -104,10 +110,19 @@ class Board
     end
 
     def maybe_promote(piece)
-        
+        black_success = piece.color == :black && piece.posn[1] == RED_HOME_ROW
+        red_success = piece.color == :red && piece.posn[1] == BLACK_HOME_ROW
+        if black_success || red_success
+            piece.king = true
+        end
 
         piece
     end
+
+    def on_board?(posn)
+        posn.all? {|coord| (0...BOARD_SIZE).include?(coord) }
+    end
+
 
     private
     def check_one_move(from_posn, to_posn, piece)
@@ -136,8 +151,8 @@ class Board
 
     def make_some_jumps(piece, start_posn,target_posns)
         captures = []
-        from_posn = start_posn
 
+        from_posn = start_posn
         target_posns.each do |to_posn|
             move_type = check_one_move(from_posn, to_posn, piece)
             case move_type
@@ -147,15 +162,15 @@ class Board
             when :slide
                 raise "Invalid Move, piece cannot slide after jump"
             else                       
-                raise "Invalid Move, piece cannot move there" 
+                raise "Invalid Move, piece cannot move to"\
+                      "#{to_posn} from #{from_posn}" 
             end                        
         end
         #final from_posn is destination square
         set_posn(piece,from_posn)
-        captures.each do |captured_posn|
-            self[*captured_posn] = nil
-        end
-
+        eliminate_captures(captures)
+        
+        piece
     end
 
     def jumped_over(start_posn,end_posn)
@@ -167,8 +182,12 @@ class Board
          (start_posn[1]+end_posn[1])/2] 
     end
 
-    RED_SIDE = (0..2).to_a
-    BLACK_SIDE =  (5..7).to_a
+    def eliminate_captures(captures)
+        captures.each do |captured_posn|
+            self[*captured_posn] = nil
+        end
+    end
+
 
     def initial_grid
         self.grid = Array.new(8) { Array.new(8) }
@@ -212,6 +231,7 @@ def setup_jump
     b.move([7,5],[6,4])
     b.move([6,6],[5,5])
     b.move([5,7],[6,6])
+    b.move([1,3],[[3,5],[5,7]])
     b.display
     puts "\n"
     #puts "a jump; b.move([1,3],[3,5])"
