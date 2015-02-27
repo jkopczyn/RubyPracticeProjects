@@ -1,4 +1,6 @@
 require_relative './game.rb'
+require 'socket'
+require 'json'
 
 class NetworkGame < Game
   def initialize
