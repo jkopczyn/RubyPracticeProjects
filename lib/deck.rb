@@ -13,6 +13,10 @@ class Deck
     end
   end
 
+  def size
+    @cards.length
+  end
+
   def initialize(cards = nil)
     @cards = cards
     @cards ||= Deck.new_deck
