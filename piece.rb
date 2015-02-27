@@ -43,7 +43,7 @@ class Piece
 
     def inspect
         "<Piece @king=#{king?} @posn=#{posn.inspect} @color=#{color} "\
-        "@board = #{@board.nil? ? nil : '<Board ...>'}"
+        "@board = #{@board.nil? ? nil : '<Board ...>'}>"
     end
 
     def slides
