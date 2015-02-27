@@ -68,8 +68,10 @@ class Board
     end
 
     def render
-        out_string = ""
+        out_string = coordinate_row
+
         grid.each_with_index do |row,vertical_index|
+            out_string << "#{vertical_index} "
             row.each_with_index do |space,horizontal_index|
                 posn = [horizontal_index,vertical_index]
                 if space.nil?
@@ -85,7 +87,15 @@ class Board
             out_string << "\n"
         end
 
-        out_string
+        out_string << coordinate_row
+    end
+
+    def coordinate_row
+        string = "  "
+        BOARD_SIZE.times do |index|
+            string << "#{index} "
+        end
+        string << "\n"
     end
 
     def background_color(posn)
@@ -100,8 +110,9 @@ class Board
         raise "Invalid Move, no piece there" if empty?(start_posn)
         piece = self[*start_posn]
        
-        if target_posns.count == 2 && target_posns.first.class != Array
-            make_one_move(piece,start_posn,target_posns)
+        #debugger
+        if target_posns.count == 1
+            make_one_move(piece,start_posn,target_posns.first)
         else
            make_some_jumps(piece, start_posn, target_posns) 
         end
@@ -123,6 +134,9 @@ class Board
         posn.all? {|coord| (0...BOARD_SIZE).include?(coord) }
     end
 
+    def find_pieces(color)
+        grid.flatten.compact.keep_if {|piece| piece.color == color }
+    end
 
     private
     def check_one_move(from_posn, to_posn, piece)
