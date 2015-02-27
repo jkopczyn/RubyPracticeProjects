@@ -3,7 +3,7 @@ require 'socket'
 require 'json'
 
 class NetworkGame < Game
-  def initialize
+def initialize
     @board = Board.new
     if ARGV.empty?
       port = 3000

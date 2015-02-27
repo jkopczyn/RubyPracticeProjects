@@ -1,4 +1,9 @@
 require_relative './board.rb'
+<<<<<<< HEAD
+=======
+require 'socket'
+require 'json'
+>>>>>>> 35957691467341c8ae12c13b44036d0ce5159c72
 
 class Game
   def initialize
