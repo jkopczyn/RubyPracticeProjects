@@ -17,6 +17,11 @@ class Card
     RANKS.find_index(rank) <=> RANKS.find_index(other.rank)
   end
 
+  # true if other is one rank higher in a straight
+  def next_rank?(other)
+    RANKS.find_index(other.rank) == 1 + RANKS.find_index(rank)
+  end
+
   def same_suit?(other_card)
     suit == other_card.suit
   end

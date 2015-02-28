@@ -1,5 +1,6 @@
 require 'rspec'
 require 'hand'
+require 'byebug'
 
 describe Hand do
   describe '::new_hand' do
@@ -18,7 +19,7 @@ describe Hand do
 
     it 'creates a hand from a list of cards' do
       test_hand = Hand.new(some_cards)
-      expect(test_hand.cards).to eq some_cards
+      expect(test_hand.cards).to eq some_cards.sort.reverse
     end
   end
 
@@ -53,7 +54,7 @@ describe Hand do
       expected_hand = small_flush.cards + some_cards
       small_flush.receive_cards(some_cards)
       expect(small_flush.length).to be 5
-      expect(small_flush.cards).to eq expected_hand
+      expect(small_flush.cards).to eq expected_hand.sort.reverse
     end
   end
 
