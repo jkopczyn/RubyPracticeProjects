@@ -4,11 +4,12 @@ require 'hand'
 describe Hand do
   describe '::new_hand' do
     it 'creates a new hand of five cards' do
-      deck = Deck.new.shuffle!
+      deck = Deck.new
+      deck.shuffle!
       test_hand = Hand.new_hand(deck)
       expect(test_hand.length).to be 5
       expect(deck.size).to be 47
-      expect(test_hand.uniq.length).to be 5
+      expect(test_hand.cards.uniq.length).to be 5
     end
   end
 
@@ -21,24 +22,24 @@ describe Hand do
     end
   end
 
-  describe '#discard' do
+  describe '#discard!' do
     let_cards
     let(:straight_flush_to_six) { Hand.new([two_of_hearts, three_of_hearts,
       four_of_hearts, five_of_hearts, six_of_hearts]) }
     it "should discard one card" do
       copy = straight_flush_to_six.cards.dup
-      expect(straight_flush_to_six.discard([3])).to eq([copy[3]])
+      expect(straight_flush_to_six.discard!([3])).to eq([copy[3]])
       expect(straight_flush_to_six.length).to be 4
     end
 
     it "should discard multiple cards" do
       copy = straight_flush_to_six.cards.dup
-      expect(straight_flush_to_six.discard([3, 2, 4])).to eq([copy[3], copy[2], copy[4]])
+      expect(straight_flush_to_six.discard!([3, 2, 4])).to eq([copy[3], copy[2], copy[4]])
       expect(straight_flush_to_six.length).to be 2
     end
 
     it "should raise an error if index out of range" do
-      expect { straight_flush_to_six.discard([5]) }.to raise_error
+      expect { straight_flush_to_six.discard!([5]) }.to raise_error
     end
   end
 
@@ -49,10 +50,10 @@ describe Hand do
     end
     let(:some_cards) { [Card.new(:nine, :spades), Card.new(:jack, :spades)] }
     it "adds supplied cards to the hand" do
+      expected_hand = small_flush.cards + some_cards
       small_flush.receive_cards(some_cards)
       expect(small_flush.length).to be 5
-      expect(small_flush).to_include some_cards[0]
-      expect(small_flush).to_include some_cards[1]
+      expect(small_flush.cards).to eq expected_hand
     end
   end
 
