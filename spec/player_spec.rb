@@ -1,3 +1,5 @@
+require 'rspec'
+require 'player'
 
 describe "#draw_cards" do
   let_cards
