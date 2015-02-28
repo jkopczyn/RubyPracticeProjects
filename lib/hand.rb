@@ -29,6 +29,14 @@ class Hand
     @cards = cards.sort.reverse
   end
 
+  def sort
+    Hand.new(cards).sort!
+  end
+
+  def count
+    cards.count
+  end
+
   #used for side effect, not return value
   def discard!(indices)
     discarded = []
@@ -39,6 +47,11 @@ class Hand
     end
     @cards.compact!
     discarded
+  end
+
+  def include?(card)
+    cards.map { |other_card| card.same_suit?(other_card) &&
+          0 == (card <=> other_card) }.any?
   end
 
   def each
