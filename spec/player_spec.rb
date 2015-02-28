@@ -1,6 +1,11 @@
 require 'rspec'
 require 'player'
 
+describe Player do
+  
+end
+
+
 describe "#draw_cards" do
   let_cards
   let(:small_flush) { Hand.new([two_of_hearts, three_of_hearts,
