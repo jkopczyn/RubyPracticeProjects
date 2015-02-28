@@ -14,8 +14,8 @@ describe Game do
     end
 
     it 'raises an error without correct arguments' do
-      expect(Game.new(5)).to raise ArgumentError
-      expect(Game.new).to raise ArgumentError
+      expect { Game.new(5) }.to raise_error(ArgumentError)
+      expect { Game.new }.to raise_error(ArgumentError)
     end
 
     it 'has a pot that starts at 0' do
@@ -31,14 +31,14 @@ describe Game do
     let(:players) do
       Array.new(3) do |i|
         normal = double("player#{i}")
-        allow(normal).to receive(:bet).and_return(0)
+        allow(normal).to receive(:make_bet).and_return(0)
 
         normal
       end
     end
     let(:folding_player) do
       folder = double("player")
-      allow(folder).to receive(:bet).and_return(:fold)
+      allow(folder).to receive(:make_bet).and_return(:fold)
 
       folder
     end
@@ -46,7 +46,7 @@ describe Game do
     subject(:game) { Game.new(players, deck) }
 
     it "asks players for bets" do
-      game.players.each { |player| expect(player).to receive(:bet) }
+      game.players.each { |player| expect(player).to receive(:make_bet) }
       game.betting_round
     end
 
@@ -73,25 +73,27 @@ describe Game do
       game.players.each do |player|
         expect(player).to receive(:take_new_cards).with(deck)
       end
+      game.draw_new_cards
     end
   end
 
-  describe '#find_winner' do
-    let(:players) { [Player(0, 0), Player(0, 3), Player(0, 2)] }
-
+  describe '#winners' do
+    let(:player1) { Player.new(0, 0) }
+    let(:player2) { Player.new(0, 3) }
+    let(:player3) { Player.new(0, 2) }
+    let(:tied_player) { Player.new(0, 3) }
+    let(:players) { [player1, player2, player3] }
+    let(:players_with_tie) { players + [tied_player] }
     let(:deck) { double("deck") }
-    let(:tied_player) { Player(0, 3) }
-    let(:players_with_tie) { :players + [:tied_player] }
     let(:game_without_tie) { Game.new(players, deck) }
     let(:game_with_tie) { Game.new(players_with_tie, deck) }
 
     it "finds the winner when there is one winner" do
-      expect(game_without_tie.find_winner).to eq([players[1]])
+      expect(game_without_tie.winners).to eq([player2])
     end
 
     it "finds the winner with a tie" do
-      expect(game_with_tie.find_winner).to eq([players_with_tie[1],
-                                               tied_player])
+      expect(game_with_tie.winners).to eq([player2, tied_player])
     end
   end
 end
