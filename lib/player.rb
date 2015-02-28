@@ -2,6 +2,7 @@ require 'hand'
 require 'byebug'
 
 class Player
+  include Comparable
   attr_reader :bankroll, :hand
 
   RANK_HASH = { '2' => :two, '3' => :three, '4' => :four, '5' => :five, '6' => :six,
@@ -12,6 +13,10 @@ class Player
 
   def initialize(bankroll, hand)
     @bankroll, @hand = bankroll, hand
+  end
+
+  def <=>(other)
+    hand <=> other.hand
   end
 
   def draw_hand(deck)
