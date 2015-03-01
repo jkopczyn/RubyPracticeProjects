@@ -58,9 +58,9 @@ class Hand
     @cards.each
   end
 
+
   def remove_rank(rank)
-    new_cards = cards.dup.remove_rank(rank)
-    Hand.new(new_cards)
+    Hand.new(cards.dup.reject { |elem| elem.rank == rank})
   end
 
   def <=>(other)
@@ -194,9 +194,5 @@ class Array
       return comparison unless comparison == 0
     end
     0
-  end
-
-  def remove_rank(rank)
-    self.reject { |elem| elem.rank == rank}
   end
 end
